@@ -6,7 +6,7 @@ export const moduleType=c=>c.type==='input'?'input':c.control==='dim'?'dimmer':'
 export function validateProject(p){
  if(!p||p.version!==1||!Array.isArray(p.circuits)||!Array.isArray(p.modules)||p.circuits.length>3000||p.modules.length>500)throw Error('Nieprawidłowy format lub rozmiar projektu.');
  if(typeof p.name!=='string'||p.name.length>150)throw Error('Nieprawidłowa nazwa projektu.');
- for(const m of p.modules)if(!m||!['relay','dimmer','input'].includes(m.type)||!validChannels(m.type,m.channels)||!['KNX','LOXONE'].includes(m.system)||typeof m.name!=='string'||typeof m.id!=='string')throw Error('Nieprawidłowa konfiguracja modułu.');
+ for(const m of p.modules)if(!m||!['relay','dimmer','input'].includes(m.type)||!validChannels(m.type,m.channels)||!['KNX','LOXONE'].includes(m.system)||typeof m.name!=='string'||typeof m.id!=='string'||typeof m.blindCapable!=='boolean')throw Error('Nieprawidłowa konfiguracja modułu.');
  for(const c of p.circuits)if(!c||!Object.hasOwn(TYPES,c.type)||typeof c.id!=='string'||typeof c.room!=='string'||typeof c.name!=='string'||!['KNX','LOXONE'].includes(c.system)||!['relay','dim'].includes(c.control)||!Number.isFinite(c.watts)||c.watts<0||c.watts>100000||(isMotor(c)||c.type==='input')&&c.control==='dim')throw Error('Nieprawidłowy obwód.');
  if(new Set(p.circuits.map(c=>c.id)).size!==p.circuits.length||new Set(p.modules.map(m=>m.id)).size!==p.modules.length)throw Error('Powtórzone identyfikatory.');
  if(!p.settings||!Number.isInteger(p.settings.rcds)||p.settings.rcds<2||p.settings.rcds>12||!Number.isInteger(p.settings.maxPerBreaker)||p.settings.maxPerBreaker<1||p.settings.maxPerBreaker>20)throw Error('Nieprawidłowe ustawienia zabezpieczeń.');
@@ -45,4 +45,5 @@ export function demo(){
  return {version:1,name:'Dom pod gwiazdami',circuits,modules:[{id:uid(),name:'A1 · Aktor przełączający',type:'relay',system:'KNX',channels:24,blindCapable:true},{id:uid(),name:'D1 · Aktor ściemniający',type:'dimmer',system:'KNX',channels:4,blindCapable:false},{id:uid(),name:'B1 · Wejścia binarne',type:'input',system:'KNX',channels:4,blindCapable:false}],settings:{rcds:3,maxPerBreaker:4}};
 }
 export function csv(rows){const safe=x=>{let s=String(x??'');if(/^[=+@\-\t\r]/.test(s))s="'"+s;return '"'+s.replaceAll('"','""')+'"';};return '\uFEFF'+rows.map(r=>r.map(safe).join(';')).join('\r\n');}
+
 
