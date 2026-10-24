@@ -57,4 +57,3 @@ To narzędzie koncepcyjne, nie dokumentacja wykonawcza. Nie dobiera przekrojów,
 
 PDF.js 6.4.299 (Apache-2.0) jest przechowywany lokalnie w `dist/vendor/`; licencja w `LICENSE-pdfjs.txt`. Decyzje architektoniczne: `docs/adr/`. Zasady współpracy i PR: `CONTRIBUTING.md`.
 
-
