@@ -8,10 +8,12 @@ export function templateSamples(data,width,rect){
 }
 export async function matchTemplate(data,width,height,rect,threshold=.88,onProgress=()=>{}){
  const {positives,negatives}=templateSamples(data,width,rect),candidates=[];
- const stride=Math.max(1,Math.min(3,Math.floor(Math.min(rect.w,rect.h)/12)));
+ const stride=1;
  function score(x,y){let pos=0,neg=0;for(const p of positives)if(data[(y+p.y)*width+x+p.x]<170)pos++;if(pos/positives.length<threshold-.15)return 0;for(const p of negatives)if(data[(y+p.y)*width+x+p.x]>=170)neg++;return .7*pos/positives.length+.3*neg/negatives.length;}
- for(let y=0;y<=height-rect.h;y+=stride){for(let x=0;x<=width-rect.w;x+=stride){let s=score(x,y);if(s>=threshold){let best={x,y,w:rect.w,h:rect.h,score:s};for(let dy=-stride+1;dy<stride;dy++)for(let dx=-stride+1;dx<stride;dx++){const xx=x+dx,yy=y+dy;if(xx<0||yy<0||xx+rect.w>width||yy+rect.h>height)continue;s=score(xx,yy);if(s>best.score)best={...best,x:xx,y:yy,score:s};}candidates.push(best);}}
+ for(let y=0;y<=height-rect.h;y+=stride){for(let x=0;x<=width-rect.w;x+=stride){let s=score(x,y);if(s>=threshold-.15){let best={x,y,w:rect.w,h:rect.h,score:s};for(let dy=-stride+1;dy<stride;dy++)for(let dx=-stride+1;dx<stride;dx++){const xx=x+dx,yy=y+dy;if(xx<0||yy<0||xx+rect.w>width||yy+rect.h>height)continue;s=score(xx,yy);if(s>best.score)best={...best,x:xx,y:yy,score:s};}if(best.score>=threshold)candidates.push(best);}}
  if(y%45<stride){onProgress(y/height);await new Promise(r=>setTimeout(r,0));}}
  const kept=[];candidates.sort((a,b)=>b.score-a.score);for(const c of candidates){if(!kept.some(k=>Math.abs(k.x-c.x)<rect.w*.65&&Math.abs(k.y-c.y)<rect.h*.65))kept.push(c);if(kept.length>=300)break;}
  return kept.sort((a,b)=>a.y-b.y||a.x-b.x);
 }
+
+
